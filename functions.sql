@@ -9,11 +9,11 @@ AS
 BEGIN
     DECLARE @nb INT;
 
-    SELECT @nb = COUNT(*)
+    SELECT @nb = COUNT(DISTINCT w.id)
     FROM workers w
     INNER JOIN contracts c ON w.id = c.id_worker
     WHERE c.id_factorie = @factory_id
-      AND c.end_contract IS NULL;
+      AND (c.end_contract IS NULL OR c.end_contract >= GETDATE());
 
     RETURN ISNULL(@nb, 0);
 END;

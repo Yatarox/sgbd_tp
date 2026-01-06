@@ -123,12 +123,29 @@ BEGIN
 END
 GO
 
+--creation de la table suppliers (DOIT être créée avant parts)
+IF OBJECT_ID('suppliers', 'U') IS NULL
+BEGIN
+    CREATE TABLE suppliers (
+        id INT PRIMARY KEY IDENTITY(1,1),
+        name VARCHAR(50) NOT NULL UNIQUE
+    );
+    PRINT '✓ Table suppliers créée';
+END
+ELSE
+BEGIN
+    PRINT '→ Table suppliers existe déjà';
+END
+GO
+
 --creation de la table parts
 IF OBJECT_ID('parts', 'U') IS NULL
 BEGIN
     CREATE TABLE parts (
         id INT PRIMARY KEY IDENTITY(1,1),
-        name VARCHAR(50) NOT NULL UNIQUE
+        name VARCHAR(50) NOT NULL UNIQUE,
+        id_supplier INT NOT NULL,
+        CONSTRAINT FK_Parts_Supplier FOREIGN KEY (id_supplier) REFERENCES suppliers(id)
     );
     PRINT 'Table parts créée';
 END
@@ -174,22 +191,6 @@ END
 ELSE
 BEGIN
     PRINT 'Table new_part existe déjà';
-END
-GO
-
---creation de la table suppliers
-
-IF OBJECT_ID('suppliers', 'U') IS NULL
-BEGIN
-    CREATE TABLE suppliers (
-        id INT PRIMARY KEY IDENTITY(1,1),
-        name VARCHAR(50) NOT NULL UNIQUE
-    );
-    PRINT '✓ Table suppliers créée';
-END
-ELSE
-BEGIN
-    PRINT '→ Table suppliers existe déjà';
 END
 GO
 

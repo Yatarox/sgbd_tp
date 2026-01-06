@@ -7,7 +7,7 @@ CREATE VIEW ALL_WORKERS AS
 SELECT workers.id, workers.lastname, workers.firstname, workers.age, MAX(contracts.start_contract) AS start_date
 FROM workers
 INNER JOIN contracts ON workers.id = contracts.id_worker
-WHERE contracts.end_contract IS NULL
+WHERE contracts.end_contract IS NULL OR contracts.end_contract >= GETDATE()
 GROUP BY workers.id, workers.lastname, workers.firstname, workers.age
 ORDER BY start_date DESC;
 GO
@@ -28,11 +28,11 @@ IF OBJECT_ID('BEST_SUPPLIERS', 'V') IS NOT NULL
 GO
 
 CREATE VIEW BEST_SUPPLIERS AS
-SELECT s.name AS supplier, COUNT(*) AS nb_parts
+SELECT s.name AS supplier, COUNT(p.id) AS nb_parts
 FROM suppliers s
 INNER JOIN parts p ON s.id = p.id_supplier
 GROUP BY s.name
-HAVING COUNT(*) > 1000
+HAVING COUNT(p.id) > 0
 ORDER BY nb_parts DESC;
 GO
 
