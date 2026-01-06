@@ -1,0 +1,82 @@
+-- Fonction GET_NB_WORKERS
+IF OBJECT_ID('GET_NB_WORKERS', 'FN') IS NOT NULL
+    DROP FUNCTION GET_NB_WORKERS;
+GO
+
+CREATE FUNCTION GET_NB_WORKERS(@factory_id INT)
+RETURNS INT
+AS
+BEGIN
+    DECLARE @nb INT;
+
+    SELECT @nb = COUNT(*)
+    FROM workers w
+    INNER JOIN contracts c ON w.id = c.id_worker
+    WHERE c.id_factorie = @factory_id
+      AND c.end_contract IS NULL;
+
+    RETURN ISNULL(@nb, 0);
+END;
+GO
+
+-- Fonction GET_NB_BIG_ROBOTS
+IF OBJECT_ID('GET_NB_BIG_ROBOTS', 'FN') IS NOT NULL
+    DROP FUNCTION GET_NB_BIG_ROBOTS;
+GO
+
+CREATE FUNCTION GET_NB_BIG_ROBOTS()
+RETURNS INT
+AS
+BEGIN
+    DECLARE @nb INT;
+
+    SELECT @nb = COUNT(*)
+    FROM (
+        SELECT r.id
+        FROM robots r
+        INNER JOIN robot_component rc ON r.id = rc.id_robot
+        GROUP BY r.id
+        HAVING COUNT(rc.id_part) > 3
+    ) AS subquery;
+
+    RETURN ISNULL(@nb, 0);
+END;
+GO
+
+-- Fonction GET_BEST_SUPPLIER
+IF OBJECT_ID('GET_BEST_SUPPLIER', 'FN') IS NOT NULL
+    DROP FUNCTION GET_BEST_SUPPLIER;
+GO
+
+CREATE FUNCTION GET_BEST_SUPPLIER()
+RETURNS VARCHAR(100)
+AS
+BEGIN
+    DECLARE @best_name VARCHAR(100);
+
+    SELECT TOP 1 @best_name = supplier
+    FROM BEST_SUPPLIERS
+    ORDER BY nb_parts DESC;
+
+    RETURN @best_name;
+END;
+GO
+
+-- Fonction GET_OLDEST_WORKER
+IF OBJECT_ID('GET_OLDEST_WORKER', 'FN') IS NOT NULL
+    DROP FUNCTION GET_OLDEST_WORKER;
+GO
+
+CREATE FUNCTION GET_OLDEST_WORKER()
+RETURNS INT
+AS
+BEGIN
+    DECLARE @oldest_id INT;
+
+    SELECT TOP 1 @oldest_id = id
+    FROM ALL_WORKERS
+    ORDER BY start_date ASC;
+
+    RETURN @oldest_id;
+END;
+GO

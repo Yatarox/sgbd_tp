@@ -193,6 +193,21 @@ BEGIN
 END
 GO
 
+--creation de la table robot_component 
+
+IF OBJECT_ID('robot_component', 'U') IS NULL
+BEGIN
+    CREATE TABLE robot_component (
+        id INT PRIMARY KEY IDENTITY(1,1),
+        id_robot INT NOT NULL,
+        id_part INT NOT NULL,
+        CONSTRAINT FK_RobotComponent_Robot FOREIGN KEY (id_robot) REFERENCES robots(id),
+        CONSTRAINT FK_RobotComponent_Part FOREIGN KEY (id_part) REFERENCES parts(id)
+    );
+    PRINT 'Table robot_component créée';
+END
+
+
 
 
 PRINT 'Base de donnees HUMANROBOT créee avec succes';
