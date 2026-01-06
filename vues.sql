@@ -32,8 +32,8 @@ GO
 CREATE VIEW BEST_SUPPLIERS AS
 SELECT s.name AS supplier, COUNT(*) AS nb_parts
 FROM suppliers s
-INNER JOIN new_part p ON s.id = p.id_supplier
-GROUP BY s.name
+INNER JOIN new_part np ON s.id = np.id_supplier
+GROUP BY s.name, s.id
 HAVING COUNT(*) > 1000;
 GO
 
