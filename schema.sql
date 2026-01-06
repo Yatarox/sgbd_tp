@@ -157,25 +157,6 @@ BEGIN
 END
 GO
 
---creation de la table new_part
-IF OBJECT_ID('new_part', 'U') IS NULL
-BEGIN
-    CREATE TABLE new_part (
-        id INT PRIMARY KEY IDENTITY(1,1),
-        count_pieces INT NOT NULL CHECK (count_pieces > 0),
-        piece_added DATE NOT NULL DEFAULT GETDATE(),
-        id_part INT NOT NULL,
-        id_factorie INT NOT NULL,
-        CONSTRAINT FK_NewPart_Part FOREIGN KEY (id_part) REFERENCES parts(id),
-        CONSTRAINT FK_NewPart_Factory FOREIGN KEY (id_factorie) REFERENCES factories(id)
-    );
-    PRINT 'Table new_part créée';
-END
-ELSE
-BEGIN
-    PRINT 'Table new_part existe déjà';
-END
-GO
 
 --creation de la table suppliers
 
@@ -190,6 +171,28 @@ END
 ELSE
 BEGIN
     PRINT '→ Table suppliers existe déjà';
+END
+GO
+
+--creation de la table new_part
+IF OBJECT_ID('new_part', 'U') IS NULL
+BEGIN
+    CREATE TABLE new_part (
+        id INT PRIMARY KEY IDENTITY(1,1),
+        count_pieces INT NOT NULL CHECK (count_pieces > 0),
+        piece_added DATE NOT NULL DEFAULT GETDATE(),
+        id_part INT NOT NULL,
+        id_factorie INT NOT NULL,
+        id_supplier INT NOT NULL,
+        CONSTRAINT FK_NewPart_Supplier FOREIGN KEY (id_supplier) REFERENCES suppliers(id),
+        CONSTRAINT FK_NewPart_Part FOREIGN KEY (id_part) REFERENCES parts(id),
+        CONSTRAINT FK_NewPart_Factory FOREIGN KEY (id_factorie) REFERENCES factories(id)
+    );
+    PRINT 'Table new_part créée';
+END
+ELSE
+BEGIN
+    PRINT 'Table new_part existe déjà';
 END
 GO
 

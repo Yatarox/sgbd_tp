@@ -1,3 +1,6 @@
+USE HUMANROBOT;
+GO
+
 -- Vue ALL_WORKERS
 IF OBJECT_ID('ALL_WORKERS', 'V') IS NOT NULL
     DROP VIEW ALL_WORKERS;
@@ -8,8 +11,7 @@ SELECT workers.id, workers.lastname, workers.firstname, workers.age, MAX(contrac
 FROM workers
 INNER JOIN contracts ON workers.id = contracts.id_worker
 WHERE contracts.end_contract IS NULL
-GROUP BY workers.id, workers.lastname, workers.firstname, workers.age
-ORDER BY start_date DESC;
+GROUP BY workers.id, workers.lastname, workers.firstname, workers.age;
 GO
 
 -- Vue ALL_WORKERS_ELAPSED
@@ -30,10 +32,9 @@ GO
 CREATE VIEW BEST_SUPPLIERS AS
 SELECT s.name AS supplier, COUNT(*) AS nb_parts
 FROM suppliers s
-INNER JOIN parts p ON s.id = p.id_supplier
+INNER JOIN new_part p ON s.id = p.id_supplier
 GROUP BY s.name
-HAVING COUNT(*) > 1000
-ORDER BY nb_parts DESC;
+HAVING COUNT(*) > 1000;
 GO
 
 -- Vue ROBOTS_FACTORIES

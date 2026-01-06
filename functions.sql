@@ -1,3 +1,4 @@
+USE HUMANROBOT
 -- Fonction GET_NB_WORKERS
 IF OBJECT_ID('GET_NB_WORKERS', 'FN') IS NOT NULL
     DROP FUNCTION GET_NB_WORKERS;
@@ -54,9 +55,12 @@ AS
 BEGIN
     DECLARE @best_name VARCHAR(100);
 
-    SELECT TOP 1 @best_name = supplier
-    FROM BEST_SUPPLIERS
-    ORDER BY nb_parts DESC;
+    SELECT TOP 1 @best_name = s.name
+    FROM suppliers s
+    INNER JOIN new_part p ON s.id = p.id_supplier
+    GROUP BY s.name
+    HAVING COUNT(*) > 1000
+    ORDER BY COUNT(*) DESC;
 
     RETURN @best_name;
 END;
@@ -73,9 +77,12 @@ AS
 BEGIN
     DECLARE @oldest_id INT;
 
-    SELECT TOP 1 @oldest_id = id
-    FROM ALL_WORKERS
-    ORDER BY start_date ASC;
+    SELECT TOP 1 @oldest_id = workers.id
+    FROM workers
+    INNER JOIN contracts ON workers.id = contracts.id_worker
+    WHERE contracts.end_contract IS NULL
+    GROUP BY workers.id, workers.lastname, workers.firstname, workers.age
+    ORDER BY MAX(contracts.start_contract) ASC;
 
     RETURN @oldest_id;
 END;
