@@ -1,10 +1,12 @@
+-- SQL MARIA DB -- 
+
 DROP DATABASE IF EXISTS HUMANROBOT;
 CREATE DATABASE HUMANROBOT;
 USE HUMANROBOT;
 
 -- Table workers
 CREATE TABLE workers (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     firstname VARCHAR(50) NOT NULL,
     lastname VARCHAR(50) NOT NULL,
     age INT NOT NULL
@@ -12,14 +14,14 @@ CREATE TABLE workers (
 
 -- Table factories
 CREATE TABLE factories (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE,
     date_of_creation DATE NOT NULL
 );
 
 -- Table contracts
 CREATE TABLE contracts (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     start_contract DATE NOT NULL,
     end_contract DATE NULL,
     id_factorie INT NOT NULL,
@@ -31,7 +33,7 @@ CREATE TABLE contracts (
 
 -- Table robots
 CREATE TABLE robots (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     model VARCHAR(50) NOT NULL UNIQUE
 );
 
@@ -47,8 +49,8 @@ CREATE TABLE stock_robot (
 
 -- Table new_robots
 CREATE TABLE new_robots (
-    id INT PRIMARY KEY IDENTITY(1,1),
-    date_added DATE NOT NULL DEFAULT GETDATE(),
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    date_added DATE NOT NULL DEFAULT (CURRENT_DATE),
     numbers_robots_added INT NOT NULL CHECK (numbers_robots_added >= 0),
     id_factorie INT NOT NULL,
     id_robot INT NOT NULL,
@@ -58,7 +60,7 @@ CREATE TABLE new_robots (
 
 -- Table parts
 CREATE TABLE parts (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
@@ -74,9 +76,9 @@ CREATE TABLE stocks (
 
 -- Table new_part
 CREATE TABLE new_part (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     count_pieces INT NOT NULL CHECK (count_pieces > 0),
-    piece_added DATE NOT NULL DEFAULT GETDATE(),
+    piece_added DATE NOT NULL DEFAULT (CURRENT_DATE),
     id_part INT NOT NULL,
     id_factorie INT NOT NULL,
     CONSTRAINT FK_NewPart_Part FOREIGN KEY (id_part) REFERENCES parts(id),
@@ -85,13 +87,13 @@ CREATE TABLE new_part (
 
 -- Table suppliers
 CREATE TABLE suppliers (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     name VARCHAR(50) NOT NULL UNIQUE
 );
 
 -- Table robot_component
 CREATE TABLE robot_component (
-    id INT PRIMARY KEY IDENTITY(1,1),
+    id INT PRIMARY KEY AUTO_INCREMENT,
     id_robot INT NOT NULL,
     id_part INT NOT NULL,
     CONSTRAINT FK_RobotComponent_Robot FOREIGN KEY (id_robot) REFERENCES robots(id),
