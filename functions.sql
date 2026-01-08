@@ -13,10 +13,9 @@ BEGIN
     DECLARE @nb INT;
 
     SELECT @nb = COUNT(*)
-    FROM workers w
-    INNER JOIN contracts c ON w.id = c.id_worker
-    WHERE c.id_factorie = @factory_id
-      AND c.end_contract IS NULL;
+    FROM ALL_WORKERS aw
+    INNER JOIN contracts c ON aw.id = c.id_worker
+    WHERE c.id_factorie = @factory_id;
 
     RETURN ISNULL(@nb, 0);
 END;

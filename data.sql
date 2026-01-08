@@ -1,8 +1,6 @@
 -- ------------------------------------------------------------
 -- HUMANROBOT - data.sql (SQL Server / T-SQL)
--- Insertion des données pour le schema fourni :
--- factories, workers, contracts, robots, stock_robot, new_robots,
--- parts, stocks, new_part, suppliers
+-- Insertion des données pour le schema fourni
 -- ------------------------------------------------------------
 
 USE HUMANROBOT;
@@ -12,6 +10,7 @@ GO
 -- RESET (suppression des données en respectant les clés étrangères)
 -- ------------------------------------------------------------
 
+DELETE FROM robot_component;
 DELETE FROM contracts;
 DELETE FROM new_robots;
 DELETE FROM stock_robot;
@@ -26,6 +25,7 @@ DELETE FROM factories;
 GO
 
 -- Reset des IDENTITY
+DBCC CHECKIDENT ('robot_component', RESEED, 0);
 DBCC CHECKIDENT ('contracts', RESEED, 0);
 DBCC CHECKIDENT ('new_robots', RESEED, 0);
 DBCC CHECKIDENT ('new_part', RESEED, 0);
@@ -48,7 +48,7 @@ SET IDENTITY_INSERT factories OFF;
 GO
 
 -- ------------------------------------------------------------
--- suppliers (non reliée dans ton schéma, mais on garde les données)
+-- suppliers
 -- ------------------------------------------------------------
 SET IDENTITY_INSERT suppliers ON;
 INSERT INTO suppliers (id, name) VALUES
@@ -120,7 +120,7 @@ SET IDENTITY_INSERT workers OFF;
 GO
 
 -- ------------------------------------------------------------
--- contracts (feuille "intervenants") - dates dd/mm/yy -> yyyy-mm-dd
+-- contracts
 -- ------------------------------------------------------------
 SET IDENTITY_INSERT contracts ON;
 INSERT INTO contracts (id, start_contract, end_contract, id_factorie, id_worker) VALUES
@@ -141,7 +141,6 @@ INSERT INTO contracts (id, start_contract, end_contract, id_factorie, id_worker)
   (15, '2016-01-01', '2016-02-04', 2, 15),
   (16, '2007-09-01', '2007-10-23', 1, 16),
   (17, '2012-08-01', '2012-12-19', 1, 17),
-
   (18, '2024-07-01', '2024-10-09', 2,  1),
   (19, '2025-08-01', '2025-12-24', 1,  2),
   (20, '2023-01-01', '2023-06-24', 1,  3),
@@ -164,7 +163,7 @@ SET IDENTITY_INSERT contracts OFF;
 GO
 
 -- ------------------------------------------------------------
--- new_robots (production) - 1 ligne = (factory, robot, date, quantité)
+-- new_robots
 -- ------------------------------------------------------------
 SET IDENTITY_INSERT new_robots ON;
 INSERT INTO new_robots (id, date_added, numbers_robots_added, id_factorie, id_robot) VALUES
@@ -179,7 +178,6 @@ INSERT INTO new_robots (id, date_added, numbers_robots_added, id_factorie, id_ro
   (8,  '2020-01-01',  0, 2, 8),
   (9,  '2020-01-01', 13, 3, 9),
   (10, '2020-01-01',  9, 2,10),
-
   -- 2020-02-01
   (11, '2020-02-01',  2, 1, 1),
   (12, '2020-02-01', 13, 1, 2),
@@ -192,7 +190,6 @@ INSERT INTO new_robots (id, date_added, numbers_robots_added, id_factorie, id_ro
   (19, '2020-02-01', 38, 3, 9),
   (20, '2020-02-01', 41, 2,10),
   (21, '2020-02-01',  1, 1, 1),
-
   -- 2020-03-01
   (22, '2020-03-01', 22, 1, 2),
   (23, '2020-03-01', 31, 1, 3),
@@ -204,7 +201,6 @@ INSERT INTO new_robots (id, date_added, numbers_robots_added, id_factorie, id_ro
   (29, '2020-03-01', 39, 3, 9),
   (30, '2020-03-01',  3, 2,10),
   (31, '2020-03-01', 31, 1, 1),
-
   -- 2020-04-01
   (32, '2020-04-01', 26, 1, 2),
   (33, '2020-04-01', 26, 1, 3),
@@ -219,38 +215,58 @@ SET IDENTITY_INSERT new_robots OFF;
 GO
 
 -- ------------------------------------------------------------
--- stock_robot (stock actuel = somme des productions visibles)
+-- stock_robot
 -- ------------------------------------------------------------
 INSERT INTO stock_robot (id_factorie, id_robot, numbers_of_robots) VALUES
-  -- Usine Paris
-  (1, 1,  63),  -- Vital Strider
-  (1, 2,  75),  -- Master Sentinel
-  (1, 3,  92),  -- Vanguard Star
-  (1, 4, 112),  -- Grim Angel
-  (1, 5,  92),  -- Amplified Master
-
-  -- Usine Caracas
-  (2, 6,  79),  -- Phoenix
-  (2, 7, 103),  -- Freedom
-  (2, 8,  56),  -- Coyote
-  (2,10,  72),  -- Infinity
-
-  -- Usine Beijing
-  (3, 9, 114);  -- Vulture
+  (1, 1,  63),
+  (1, 2,  75),
+  (1, 3,  92),
+  (1, 4, 112),
+  (1, 5,  92),
+  (2, 6,  79),
+  (2, 7, 103),
+  (2, 8,  56),
+  (2,10,  72),
+  (3, 9, 114);
 GO
 
 -- ------------------------------------------------------------
--- stocks (pièces en stock par usine)
--- Hypothèse cohérente avec stock_robot :
--- chaque robot nécessite 1 pièce de chaque type
+-- new_part (avec id_supplier)
 -- ------------------------------------------------------------
--- Total robots par usine:
--- Paris   = 63+75+92+112+92 = 434
--- Caracas = 79+103+56+72    = 310
--- Beijing = 114
+SET IDENTITY_INSERT new_part ON;
+INSERT INTO new_part (id, count_pieces, piece_added, id_part, id_factorie, id_supplier) VALUES
+  -- Paris
+  (1, 434, '2020-01-01', 1, 1, 1),
+  (2, 434, '2020-01-01', 2, 1, 1),
+  (3, 434, '2020-01-01', 3, 1, 2),
+  (4, 434, '2020-01-01', 4, 1, 2),
+  (5, 434, '2020-01-01', 5, 1, 3),
+  (6, 434, '2020-01-01', 6, 1, 3),
+  (7, 434, '2020-01-01', 7, 1, 1),
+  -- Caracas
+  (8,  310, '2020-01-01', 1, 2, 2),
+  (9,  310, '2020-01-01', 2, 2, 2),
+  (10, 310, '2020-01-01', 3, 2, 1),
+  (11, 310, '2020-01-01', 4, 2, 1),
+  (12, 310, '2020-01-01', 5, 2, 3),
+  (13, 310, '2020-01-01', 6, 2, 3),
+  (14, 310, '2020-01-01', 7, 2, 2),
+  -- Beijing
+  (15, 114, '2020-01-01', 1, 3, 3),
+  (16, 114, '2020-01-01', 2, 3, 3),
+  (17, 114, '2020-01-01', 3, 3, 1),
+  (18, 114, '2020-01-01', 4, 3, 1),
+  (19, 114, '2020-01-01', 5, 3, 2),
+  (20, 114, '2020-01-01', 6, 3, 2),
+  (21, 114, '2020-01-01', 7, 3, 3);
+SET IDENTITY_INSERT new_part OFF;
+GO
 
+-- ------------------------------------------------------------
+-- stocks
+-- ------------------------------------------------------------
 INSERT INTO stocks (id_factorie, id, numbers_of_pieces) VALUES
-  -- Paris: 434 pièces de chaque type
+  -- Paris
   (1, 1, 434),
   (1, 2, 434),
   (1, 3, 434),
@@ -258,8 +274,7 @@ INSERT INTO stocks (id_factorie, id, numbers_of_pieces) VALUES
   (1, 5, 434),
   (1, 6, 434),
   (1, 7, 434),
-
-  -- Caracas: 310 pièces de chaque type
+  -- Caracas
   (2, 1, 310),
   (2, 2, 310),
   (2, 3, 310),
@@ -267,8 +282,7 @@ INSERT INTO stocks (id_factorie, id, numbers_of_pieces) VALUES
   (2, 5, 310),
   (2, 6, 310),
   (2, 7, 310),
-
-  -- Beijing: 114 pièces de chaque type
+  -- Beijing
   (3, 1, 114),
   (3, 2, 114),
   (3, 3, 114),
@@ -279,38 +293,34 @@ INSERT INTO stocks (id_factorie, id, numbers_of_pieces) VALUES
 GO
 
 -- ------------------------------------------------------------
--- new_part
--- Ton schéma ne relie pas aux suppliers (pas de id_supplier),
--- donc on enregistre ici une "livraison initiale" de pièces par usine,
--- alignée sur le stock initial ci-dessus.
+-- robot_component (composition des robots)
 -- ------------------------------------------------------------
-SET IDENTITY_INSERT new_part ON;
-INSERT INTO new_part (id, count_pieces, piece_added, id_part, id_factorie) VALUES
-  -- Paris
-  (1, 434, '2020-01-01', 1, 1),
-  (2, 434, '2020-01-01', 2, 1),
-  (3, 434, '2020-01-01', 3, 1),
-  (4, 434, '2020-01-01', 4, 1),
-  (5, 434, '2020-01-01', 5, 1),
-  (6, 434, '2020-01-01', 6, 1),
-  (7, 434, '2020-01-01', 7, 1),
+SET IDENTITY_INSERT robot_component ON;
 
-  -- Caracas
-  (8, 310, '2020-01-01', 1, 2),
-  (9, 310, '2020-01-01', 2, 2),
-  (10,310, '2020-01-01', 3, 2),
-  (11,310, '2020-01-01', 4, 2),
-  (12,310, '2020-01-01', 5, 2),
-  (13,310, '2020-01-01', 6, 2),
-  (14,310, '2020-01-01', 7, 2),
+INSERT INTO robot_component (id, id_robot, id_part) VALUES
+-- Vital Strider (ID 1)
+(1, 1, 1), (2, 1, 2), (3, 1, 3), (4, 1, 4), (5, 1, 5), (6, 1, 6), (7, 1, 7),
+-- Master Sentinel (ID 2)
+(8, 2, 1), (9, 2, 2), (10, 2, 3), (11, 2, 4), (12, 2, 5), (13, 2, 6), (14, 2, 7),
+-- Vanguard Star (ID 3)
+(15, 3, 1), (16, 3, 2), (17, 3, 3), (18, 3, 4), (19, 3, 5), (20, 3, 6), (21, 3, 7),
+-- Grim Angel (ID 4)
+(22, 4, 1), (23, 4, 2), (24, 4, 3), (25, 4, 4), (26, 4, 5), (27, 4, 6), (28, 4, 7),
+-- Amplified Master (ID 5)
+(29, 5, 1), (30, 5, 2), (31, 5, 3), (32, 5, 4), (33, 5, 5), (34, 5, 6), (35, 5, 7),
+-- Phoenix (ID 6)
+(36, 6, 1), (37, 6, 2), (38, 6, 3), (39, 6, 4), (40, 6, 5), (41, 6, 6), (42, 6, 7),
+-- Freedom (ID 7)
+(43, 7, 1), (44, 7, 2), (45, 7, 3), (46, 7, 4), (47, 7, 5), (48, 7, 6), (49, 7, 7),
+-- Coyote (ID 8)
+(50, 8, 1), (51, 8, 2), (52, 8, 3), (53, 8, 4), (54, 8, 5), (55, 8, 6), (56, 8, 7),
+-- Vulture (ID 9)
+(57, 9, 1), (58, 9, 2), (59, 9, 3), (60, 9, 4), (61, 9, 5), (62, 9, 6), (63, 9, 7),
+-- Infinity (ID 10)
+(64, 10, 1), (65, 10, 2), (66, 10, 3), (67, 10, 4), (68, 10, 5), (69, 10, 6), (70, 10, 7);
 
-  -- Beijing
-  (15,114, '2020-01-01', 1, 3),
-  (16,114, '2020-01-01', 2, 3),
-  (17,114, '2020-01-01', 3, 3),
-  (18,114, '2020-01-01', 4, 3),
-  (19,114, '2020-01-01', 5, 3),
-  (20,114, '2020-01-01', 6, 3),
-  (21,114, '2020-01-01', 7, 3);
-SET IDENTITY_INSERT new_part OFF;
+SET IDENTITY_INSERT robot_component OFF;
+GO
+
+PRINT 'Données insérées avec succès dans la base HUMANROBOT';
 GO
